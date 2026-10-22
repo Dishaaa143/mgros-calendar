@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MG Remote Office Solutions | Calendar 2027</title>
+<style>
+  :root { --navy:#12304a; --blue:#1769aa; --bg:#f4f7fb; --line:#dce5ef; --text:#1c2936; --muted:#617386; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.45 Arial,Helvetica,sans-serif; }
+  .wrap { max-width:1100px; margin:24px auto; padding:16px; }
+  .hero { background:linear-gradient(135deg,#12304a,#1769aa); color:#fff; padding:26px; border-radius:18px; }
+  .hero h1 { margin:0 0 6px; font-size:clamp(24px,4vw,36px); }
+  .hero p { margin:0; opacity:.94; }
+  .toolbar { display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin:18px 0 12px; }
+  .month-controls { display:flex; align-items:center; gap:8px; }
+  button, select { border:1px solid var(--line); border-radius:10px; padding:10px 13px; background:#fff; color:var(--text); font:inherit; cursor:pointer; }
+  button:hover { background:#edf5fc; }
+  #monthLabel { min-width:170px; text-align:center; font-size:20px; font-weight:700; color:var(--navy); }
+  .legend { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 16px; }
+  .tag { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; border-radius:999px; padding:5px 9px; }
+  .national { background:#e0efff; color:#12508a; }
+  .state { background:#fff0d9; color:#8a4d00; }
+  .company { background:#e4f7e9; color:#17652b; }
+  .event { background:#f0e8ff; color:#5a3390; }
+  .note { color:var(--muted); font-size:13px; margin:8px 0 16px; }
+  .calendar { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; }
+  .weekday { text-align:center; font-size:12px; font-weight:700; color:var(--muted); padding:8px 0; }
+  .day { min-height:104px; padding:8px; background:#fff; border:1px solid var(--line); border-radius:11px; overflow-wrap:anywhere; }
+  .day.empty { background:transparent; border:0; }
+  .day.today { outline:2px solid var(--blue); }
+  .daynum { font-weight:700; font-size:14px; }
+  .dayitem { display:block; margin-top:5px; font-size:11px; line-height:1.25; border-radius:5px; padding:4px 5px; }
+  .dayitem.national { background:#e0efff; color:#12508a; }
+  .dayitem.state { background:#fff0d9; color:#8a4d00; }
+  .dayitem.company { background:#e4f7e9; color:#17652b; }
+  .dayitem.event { background:#f0e8ff; color:#5a3390; }
+  .below { display:grid; grid-template-columns:1.1fr .9fr; gap:16px; margin-top:18px; }
+  .panel { background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .panel h2 { margin:0 0 10px; color:var(--navy); font-size:18px; }
+  #upcomingList { padding-left:18px; margin:0; }
+  #upcomingList li { margin:9px 0; }
+  .small { font-size:13px; color:var(--muted); }
+  footer { text-align:center; padding:22px 8px 10px; color:var(--muted); font-size:12px; }
+  @media(max-width:700px) {
+    .wrap { padding:10px; margin:8px auto; }
+    .hero { padding:20px; border-radius:14px; }
+    .calendar { gap:3px; }
+    .day { min-height:76px; padding:4px; border-radius:7px; }
+    .dayitem { font-size:9px; padding:3px; }
+    .weekday { font-size:10px; }
+    .below { grid-template-columns:1fr; }
+    #monthLabel { min-width:135px; font-size:17px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>MG Remote Office Solutions</h1>
+    <p><strong>Official Calendar 2027</strong> · Virtually Empowering Your Business | Grow Together</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="month-controls">
+      <button id="prev" type="button" aria-label="Previous month">← Previous</button>
+      <span id="monthLabel" aria-live="polite"></span>
+      <button id="next" type="button" aria-label="Next month">Next →</button>
+    </div>
+    <div>
+      <label for="monthSelect" class="small">Jump to month </label>
+      <select id="monthSelect" aria-label="Choose month"></select>
+      <button id="today" type="button">Go to January</button>
+    </div>
+  </div>
+
+  <div class="legend" aria-label="Calendar legend">
+    <span class="tag national">■ National / Central holiday</span>
+    <span class="tag state">■ Maharashtra — provisional</span>
+    <span class="tag company">■ Company-declared holiday</span>
+    <span class="tag event">■ Company event</span>
+  </div>
+  <p class="note"><strong>Holiday status:</strong> Central-government dates are planning references, not a statement that every private business must close. Maharashtra 2027 state dates and company holidays must be confirmed against the relevant official notification and company announcement before being treated as final. Moon-sighting dates may change.</p>
+
+  <main>
+    <div class="calendar" id="calendar" aria-label="Monthly calendar"></div>
+    <div class="below">
+      <section class="panel">
+        <h2>Upcoming dates this month</h2>
+        <ul id="upcomingList"></ul>
+        <p id="emptyMonth" class="small" hidden>No holidays or company events are listed for this month.</p>
+      </section>
+      <section class="panel">
+        <h2>Company calendar notice</h2>
+        <p>Company-declared holidays and internal events will appear here after formal confirmation by MG Remote Office Solutions.</p>
+        <p class="small"><strong>For administrators:</strong> Edit the <code>events</code> list in this HTML file to add approved company holidays, meetings, training sessions, or deadlines. Use <code>type: "company"</code> for a declared company holiday and <code>type: "event"</code> for a company event.</p>
+        <p class="small">This is a public calendar. Do not add employee personal information, private meeting links, or confidential deadlines.</p>
+      </section>
+    </div>
+  </main>
+  <footer>© 2027 MG Remote Office Solutions · Calendar dates should be checked against official notifications before use.</footer>
+</div>
+<script>
+const YEAR = 2027;
+
+/*
+  Calendar event types:
+  national = national / central-government holiday reference
+  state    = Maharashtra holiday candidate (verify state notification)
+  company  = formally declared company holiday
+  event    = company event / working-day schedule item
+
+  Replace or add company events only after approval.
+*/
+const events = [
+  {date:"2027-01-01", name:"New Year's Day (observance)", type:"event", note:"Observance; not automatically a company holiday."},
+  {date:"2027-01-26", name:"Republic Day", type:"national", note:"National holiday."},
+  {date:"2027-02-19", name:"Chhatrapati Shivaji Maharaj Jayanti", type:"state", note:"Verify Maharashtra Government's 2027 notification."},
+  {date:"2027-03-10", name:"Id-ul-Fitr (tentative)", type:"national", note:"Date may depend on moon sighting and official notification."},
+  {date:"2027-03-22", name:"Holi (planning reference)", type:"state", note:"Verify the final applicable Maharashtra holiday notification."},
+  {date:"2027-03-26", name:"Good Friday", type:"national", note:"Central-government holiday reference."},
+  {date:"2027-04-07", name:"Gudi Padwa (provisional)", type:"state", note:"Verify Maharashtra Government's 2027 notification."},
+  {date:"2027-04-14", name:"Dr. Babasaheb Ambedkar Jayanti (provisional)", type:"state", note:"Verify Maharashtra Government's 2027 notification."},
+  {date:"2027-04-15", name:"Ram Navami (planning reference)", type:"state", note:"Verify final state notification."},
+  {date:"2027-04-19", name:"Mahavir Jayanti", type:"national", note:"Central-government holiday reference."},
+  {date:"2027-05-01", name:"Maharashtra Day (provisional)", type:"state", note:"Verify Maharashtra Government's 2027 notification."},
+  {date:"2027-05-17", name:"Id-ul-Zuha / Bakrid (tentative)", type:"national", note:"Date may depend on moon sighting and official notification."},
+  {date:"2027-05-20", name:"Buddha Purnima", type:"national", note:"Central-government holiday reference."},
+  {date:"2027-06-16", name:"Muharram (tentative)", type:"national", note:"Date may depend on moon sighting and official notification."},
+  {date:"2027-08-15", name:"Independence Day", type:"national", note:"National holiday; falls on Sunday in 2027."},
+  {date:"2027-08-15", name:"Id-e-Milad (tentative)", type:"national", note:"Tentative date; verify official notification."},
+  {date:"2027-08-25", name:"Janmashtami (planning reference)", type:"state", note:"Verify final Maharashtra notification."},
+  {date:"2027-09-04", name:"Ganesh Chaturthi (provisional)", type:"state", note:"Verify Maharashtra Government's 2027 notification."},
+  {date:"2027-10-02", name:"Mahatma Gandhi Jayanti", type:"national", note:"National holiday; falls on Saturday in 2027."},
+  {date:"2027-10-09", name:"Dussehra / Vijayadashami", type:"national", note:"Central-government holiday reference."},
+  {date:"2027-10-29", name:"Diwali / Deepavali", type:"national", note:"Central-government holiday reference."},
+  {date:"2027-11-14", name:"Guru Nanak Jayanti (planning reference)", type:"national", note:"Central-government holiday reference; falls on Sunday."},
+  {date:"2027-12-25", name:"Christmas Day", type:"national", note:"Central-government holiday reference; falls on Saturday."}
+
+  // Example approved company entries (uncomment and edit as needed):
+  // ,{date:"2027-01-01", name:"MGROS Company Holiday", type:"company", note:"Add only after company approval."}
+  // ,{date:"2027-02-05", name:"Team Training Session", type:"event", note:"Add approved details; avoid private meeting links."}
+];
+
+const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+let shownMonth = 0;
+
+const calendarEl = document.getElementById("calendar");
+const monthLabel = document.getElementById("monthLabel");
+const monthSelect = document.getElementById("monthSelect");
+const upcomingList = document.getElementById("upcomingList");
+const emptyMonth = document.getElementById("emptyMonth");
+
+monthNames.forEach((m, i) => {
+  const option = document.createElement("option");
+  option.value = i;
+  option.textContent = m;
+  monthSelect.appendChild(option);
+});
+
+function eventsForMonth(month) {
+  return events.filter(e => {
+    const d = new Date(e.date + "T12:00:00");
+    return d.getFullYear() === YEAR && d.getMonth() === month;
+  }).sort((a,b) => a.date.localeCompare(b.date));
+}
+function render() {
+  monthLabel.textContent = `${monthNames[shownMonth]} ${YEAR}`;
+  monthSelect.value = String(shownMonth);
+  calendarEl.innerHTML = "";
+  weekdays.forEach(day => {
+    const el = document.createElement("div");
+    el.className = "weekday";
+    el.textContent = day;
+    calendarEl.appendChild(el);
+  });
+
+  const firstDay = new Date(YEAR, shownMonth, 1).getDay();
+  const daysInMonth = new Date(YEAR, shownMonth + 1, 0).getDate();
+  for (let i = 0; i < firstDay; i++) {
+    const blank = document.createElement("div");
+    blank.className = "day empty";
+    blank.setAttribute("aria-hidden","true");
+    calendarEl.appendChild(blank);
+  }
+  const monthEvents = eventsForMonth(shownMonth);
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${YEAR}-${String(shownMonth+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const cell = document.createElement("div");
+    cell.className = "day";
+    cell.innerHTML = `<span class="daynum">${day}</span>`;
+    const today = new Date();
+    if (today.getFullYear() === YEAR && today.getMonth() === shownMonth && today.getDate() === day) cell.classList.add("today");
+    monthEvents.filter(e => e.date === dateStr).forEach(e => {
+      const item = document.createElement("span");
+      item.className = `dayitem ${e.type}`;
+      item.textContent = e.name;
+      item.title = e.note || e.name;
+      cell.appendChild(item);
+    });
+    calendarEl.appendChild(cell);
+  }
+
+  upcomingList.innerHTML = "";
+  if (!monthEvents.length) {
+    emptyMonth.hidden = false;
+  } else {
+    emptyMonth.hidden = true;
+    monthEvents.forEach(e => {
+      const li = document.createElement("li");
+      const date = new Date(e.date + "T12:00:00");
+      const label = document.createElement("span");
+      label.className = `tag ${e.type}`;
+      label.textContent = e.type === "state" ? "MAHARASHTRA — VERIFY" :
+        e.type === "national" ? "NATIONAL / CENTRAL" :
+        e.type === "company" ? "COMPANY HOLIDAY" : "COMPANY EVENT";
+      li.appendChild(document.createTextNode(`${date.toLocaleDateString("en-IN",{day:"numeric",month:"short",weekday:"short"})} — ${e.name} `));
+      li.appendChild(label);
+      if (e.note) {
+        const note = document.createElement("div");
+        note.className = "small";
+        note.textContent = e.note;
+        li.appendChild(note);
+      }
+      upcomingList.appendChild(li);
+    });
+  }
+}
+document.getElementById("prev").addEventListener("click", () => { shownMonth = (shownMonth + 11) % 12; render(); });
+document.getElementById("next").addEventListener("click", () => { shownMonth = (shownMonth + 1) % 12; render(); });
+document.getElementById("today").addEventListener("click", () => { shownMonth = 0; render(); });
+monthSelect.addEventListener("change", e => { shownMonth = Number(e.target.value); render(); });
+render();
+</script>
+</body>
+</html>
